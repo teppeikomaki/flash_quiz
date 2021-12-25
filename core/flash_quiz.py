@@ -4,33 +4,65 @@ import pygame
 from pygame.locals import QUIT
 import random
 
-def import_csv_file(imput_num = None):
+def import_csv_file(select_directory = None, select_file = None):
     cwd = os.getcwd()
-    file_path = os.path.dirname(cwd) + "\csv"
+    file_path = os.path.dirname(cwd) 
+    file_path = os.path.join(file_path,"csv")
     files = os.listdir(file_path)
-    files_file = [f for f in files if os.path.isfile(os.path.join(file_path, f))]
-
+    files_file = [f for f in files]
     files = []
+    print("---------file/directory list-------")
     for file_name in files_file:
-        csv_file = open(file_path + "\\" + file_name, "r", encoding="utf-8", errors="", newline="" )
-        
-        f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
-        count = 0
-        for i in f:
-            count += 1
         files.append(file_name)
-        print("file_num:",len(files) - 1 ,file_name,count)
+        if os.path.isfile(os.path.join(file_path, file_name)):
+            csv_file = open(file_path + "\\" + file_name, "r", encoding="utf-8", errors="", newline="" )
+            
+            f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
+            count = 0
+            for i in f:
+                count += 1
+            print("file_num:",len(files) - 1 ,file_name,count)
+        else:
+            print("file_num:",len(files) - 1 ,file_name)
+    print("-----------------------------------")
 
-    if imput_num == None:
-        print("input file_num:")
-        imput_num = input()
-        imput_num = int(imput_num)
+    if select_directory == None:
+        print("input file or directory num",end=":")
+        selected_file = input()
+        selected_file = int(selected_file)
 
-    print(imput_num,files)
-    if not imput_num in range(len(files)):
+    if not selected_file in range(len(files)):
         raise ValueError("This file doesn't exist.")
-
-    file_path = os.path.dirname(cwd) + "\csv" + "\\" + files[imput_num]
+    
+    file_path = os.path.join(file_path,files[selected_file])
+    
+    if os.path.isdir(file_path):
+        print("---------file/directory list-------")
+        files = os.listdir(file_path)
+        files_file = [f for f in files]
+        files = []
+        for file_name in files_file:
+            files.append(file_name)
+            assert os.path.isfile(os.path.join(file_path, file_name))
+            csv_file = open(file_path + "\\" + file_name, "r", encoding="utf-8", errors="", newline="" )
+            
+            f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
+            count = 0
+            for i in f:
+                count += 1
+            print("file_num:",len(files) - 1 ,file_name,count)
+            
+        print("-----------------------------------")
+        if select_directory == None:
+            print("input file_num",end=":")
+            selected_file = input()
+            selected_file = int(selected_file)
+            
+        if not selected_file in range(len(files)):
+            raise ValueError("This file doesn't exist.")
+    
+        file_path = os.path.join(file_path, files[selected_file])
+    
     return file_path
 
 def make_question_list(file_path,is_shuffle=True):
@@ -56,6 +88,8 @@ class GUI:
         self.jfont = pygame.font.SysFont('meiryo', self.FONT_SIZE)
         print(self.surface.get_rect().width)
         print(self.surface.get_rect().height)
+        self.surface.fill((88, 90, 100))
+        pygame.display.flip()
         
     def draw(self,list):
         for print_question in list:
